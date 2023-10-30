@@ -10,19 +10,21 @@ public class Tile : MonoBehaviour
     public bool IsPlaceable { get { return isPlaceable; } }
 
     GridManager gridManager;
+    PathFinder pathFinder;
 
     Vector2Int coordinates = new Vector2Int();
 
     private void Awake()
     {
         gridManager = FindObjectOfType<GridManager>();
+        pathFinder = FindObjectOfType<PathFinder>();
     }
 
     private void Start()
     {
-        if (gridManager!=null)
+        if (gridManager != null)
         {
-            coordinates=gridManager.GetCoordinatesFromPosition(transform.position);
+            coordinates = gridManager.GetCoordinatesFromPosition(transform.position);
 
             if (!IsPlaceable)
             {
@@ -34,11 +36,16 @@ public class Tile : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (isPlaceable)
+        if (gridManager.GetNode(coordinates).isWalkable && !pathFinder.WillBlockPath(coordinates))
         {
 
             bool isPlaced = ballista.PlaceTower(ballista, transform.position);
-            isPlaceable = !isPlaced;
+
+            if (isPlaced)
+            {
+                gridManager.BlockNode(coordinates);
+                pathFinder.NotifyReceivers();
+            }
         }
     }
 }

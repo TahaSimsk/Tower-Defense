@@ -7,41 +7,34 @@ using UnityEngine.PlayerLoop;
 [RequireComponent(typeof(Enemy))]
 public class EnemyMover : MonoBehaviour
 {
-    [SerializeField] List<Tile> path = new List<Tile>();
     [SerializeField][Range(0, 100f)] float moveSpeed;
+
+    List<Node> path = new List<Node>();
 
     Enemy enemy;
 
+    GridManager gridManager;
+    PathFinder pathFinder;
+
     private void Awake()
     {
+        gridManager=FindObjectOfType<GridManager>();
+        pathFinder = FindObjectOfType<PathFinder>();
         enemy = GetComponent<Enemy>();
     }
 
     void OnEnable()
     {
-        FindPath();
-        transform.position = path[0].transform.position; //snap the ram to the first waypoint's position
+        RecalculatePath();
+        transform.position = gridManager.GetPositionFromCoordinates(pathFinder.StartCoordinates); //snap the ram to the first waypoint's position
         StartCoroutine(MoveToWaypoints());
     }
 
-    void FindPath()
+    void RecalculatePath()
     {
         path.Clear(); //clear the waypoints in the path list
 
-        GameObject parent = GameObject.FindGameObjectWithTag("Path");  //find the parent gameobject 
-
-
-        foreach (Transform child in parent.transform) //loop and add the children of the parent gameobject to path list
-        {
-            Tile waypoint = child.GetComponent<Tile>();
-
-            if (waypoint != null)
-            {
-                path.Add(waypoint);
-            }
-
-
-        }
+        path=pathFinder.GetNewPath();
     }
 
 
@@ -49,9 +42,9 @@ public class EnemyMover : MonoBehaviour
     {
         #region FirstMethod
 
-        foreach (Tile waypoint in path)
+        for (int i = 0; i < path.Count; i++)
         {
-            Vector3 targetPos = waypoint.transform.position; //set the targetPos
+            Vector3 targetPos = gridManager.GetPositionFromCoordinates(path[i].coordinates); //set the targetPos
             transform.LookAt(targetPos);
 
             while (transform.position != targetPos) //keep moving the ram if it hasn't reached the targetPos
