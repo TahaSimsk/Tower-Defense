@@ -18,23 +18,41 @@ public class EnemyMover : MonoBehaviour
 
     private void Awake()
     {
-        gridManager=FindObjectOfType<GridManager>();
+        gridManager = FindObjectOfType<GridManager>();
         pathFinder = FindObjectOfType<PathFinder>();
         enemy = GetComponent<Enemy>();
     }
 
     void OnEnable()
     {
-        RecalculatePath();
-        transform.position = gridManager.GetPositionFromCoordinates(pathFinder.StartCoordinates); //snap the ram to the first waypoint's position
-        StartCoroutine(MoveToWaypoints());
+        ReturnToStart();
+        RecalculatePath(true);
     }
 
-    void RecalculatePath()
+    void ReturnToStart() //snap the ram to the first waypoint's position
     {
+        transform.position = gridManager.GetPositionFromCoordinates(pathFinder.StartCoordinates); 
+    }
+
+    void RecalculatePath(bool resetPath)
+    {
+        Vector2Int coordinates = new Vector2Int();
+        if (resetPath)
+        {
+            coordinates = pathFinder.StartCoordinates;
+        }
+        else
+        {
+            coordinates = gridManager.GetCoordinatesFromPosition(transform.position);
+        }
+
+        StopAllCoroutines();
+
         path.Clear(); //clear the waypoints in the path list
 
-        path=pathFinder.GetNewPath();
+        path = pathFinder.GetNewPath(coordinates);
+
+        StartCoroutine(MoveToWaypoints());
     }
 
 
@@ -42,7 +60,7 @@ public class EnemyMover : MonoBehaviour
     {
         #region FirstMethod
 
-        for (int i = 0; i < path.Count; i++)
+        for (int i = 1; i < path.Count; i++)
         {
             Vector3 targetPos = gridManager.GetPositionFromCoordinates(path[i].coordinates); //set the targetPos
             transform.LookAt(targetPos);
