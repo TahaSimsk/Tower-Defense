@@ -5,6 +5,16 @@ using UnityEngine;
 public class Tower : MonoBehaviour
 {
     [SerializeField] int cost;
+    [SerializeField] List<GameObject> children;
+    [SerializeField] float buildTime;
+
+
+    private void Start()
+    {
+        DisableChildren();
+
+        StartCoroutine(Build());
+    }
 
     public bool PlaceTower(Tower tower, Vector3 position)
     {
@@ -21,5 +31,22 @@ public class Tower : MonoBehaviour
         }
         return false;
 
+    }
+
+    IEnumerator Build()
+    {
+        for (int i = 0; i < children.Count; i++)
+        {
+            children[i].SetActive(true);
+            yield return new WaitForSeconds(buildTime);
+        }
+    }
+
+    void DisableChildren()
+    {
+        for (int i = 0; i < children.Count; i++)
+        {
+            children[i].SetActive(false);
+        }
     }
 }
