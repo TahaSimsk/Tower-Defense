@@ -22021,7 +22021,7 @@ PrefabInstance:
       objectReference: {fileID: 719748393}
     - target: {fileID: 1467523482548644229, guid: b40d7ae6157ce3c42af368b856cd8f86, type: 3}
       propertyPath: startingBalance
-      value: 1500000
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 5048566758843167377, guid: b40d7ae6157ce3c42af368b856cd8f86, type: 3}
       propertyPath: m_LocalPosition.x
