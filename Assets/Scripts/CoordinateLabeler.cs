@@ -33,7 +33,7 @@ public class CoordinateLabeler : MonoBehaviour
     {
         if (!Application.isPlaying)
         {
-            DisplayCoordinates();
+            //DisplayCoordinates();
             UpdateObjectName();
 
             label.enabled = true;
