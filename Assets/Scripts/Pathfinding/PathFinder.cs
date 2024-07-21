@@ -60,13 +60,13 @@ public class PathFinder : MonoBehaviour
 
     void ExploreNeighbors()
     {
-        List<Node> neighbors = new List<Node>();
+        List<Node> neighbors = new List<Node>(); //Initialize an empty list to hold neighbor nodes
 
-        for (int i = 0; i < directions.Length; i++)
+        for (int i = 0; i < directions.Length; i++) //Loop through all possible directions
         {
-            Vector2Int neighborCoordinates = currentSearchNode.coordinates + directions[i];
+            Vector2Int neighborCoordinates = currentSearchNode.coordinates + directions[i];  //Calculate neighbor coordinates
 
-            if (grid.ContainsKey(neighborCoordinates))
+            if (grid.ContainsKey(neighborCoordinates)) //Add the neighbor node to the list if coordinates exist in the grid
             {
                 neighbors.Add(grid[neighborCoordinates]);
 
@@ -75,58 +75,60 @@ public class PathFinder : MonoBehaviour
 
         foreach (Node neighbor in neighbors)
         {
-            if (!reached.ContainsKey(neighbor.coordinates) && neighbor.isWalkable)
+            // Check if the neighbor is not reached and is walkable
+            if (!reached.ContainsKey(neighbor.coordinates) && neighbor.isWalkable) 
             {
-                neighbor.connectedTo = currentSearchNode;
-                reached.Add(neighbor.coordinates, neighbor);
-                frontier.Enqueue(neighbor);
+                neighbor.connectedTo = currentSearchNode; //Set the neighbor's connectedTo property to the current search node
+                reached.Add(neighbor.coordinates, neighbor); //Add the neighbor to the reached dictionary
+                frontier.Enqueue(neighbor); //Add the neighbor to the frontier for exploration
             }
         }
     }
 
     void BreadthFirstSearch(Vector2Int coordinates)
     {
-        startNode.isWalkable = true;
-        targetNode.isWalkable = true;
+        startNode.isWalkable = true; 
+        targetNode.isWalkable = true; 
 
-        frontier.Clear();
-        reached.Clear();
+        frontier.Clear(); 
+        reached.Clear(); 
 
         bool isRunning = true;
 
-        frontier.Enqueue(grid[coordinates]); //add the startnode to the queue
-        reached.Add(coordinates, grid[coordinates]); //when added it u already reached it so add it to the reached dictionary
+        frontier.Enqueue(grid[coordinates]); //Add the grid to the queue to be explored
+        reached.Add(coordinates, grid[coordinates]); //Add the grid to the reached dictionary
 
-        while (frontier.Count > 0 && isRunning) //if there is still nodes that aren't explored, continue the search
+        while (frontier.Count > 0 && isRunning) //If there are still nodes that haven't been explored, continue the search
         {
-            currentSearchNode = frontier.Dequeue(); //retuns the first node in queue and sets the currentSearchNode to that
-            currentSearchNode.isExplored = true;
+            currentSearchNode = frontier.Dequeue(); //Get the next node to explore
+            currentSearchNode.isExplored = true; //Mark it as explored
 
-            ExploreNeighbors();
+            ExploreNeighbors(); //Add valid neighbors to the frontier for exploration
 
-            if (currentSearchNode.coordinates == targetCoordinates) //if reached to targetcoords stop looking at nodes
+            if (currentSearchNode.coordinates == targetCoordinates) //Stop the search if the target node is reached
             {
                 isRunning = false;
             }
         }
     }
 
+
     List<Node> BuildPath()
     {
-        List<Node> path = new List<Node>();
-        Node currentNode = targetNode;
+        List<Node> path = new List<Node>(); //Initialize an empty list to store the path
+        Node currentNode = targetNode; //Start from the target node
 
-        path.Add(currentNode);
-        currentNode.isPath = true;
+        path.Add(currentNode); //Add the target node to the path
+        currentNode.isPath = true; //Mark the target node as part of the path
 
-        while (currentNode.connectedTo != null)
+        while (currentNode.connectedTo != null) //Trace back from the target node to the start node
         {
-            currentNode = currentNode.connectedTo;
-            path.Add(currentNode);
-            currentNode.isPath = true;
+            currentNode = currentNode.connectedTo; //Move to the connected node
+            path.Add(currentNode); //Add the current node to the path
+            currentNode.isPath = true; //Mark the current node as part of the path
         }
 
-        path.Reverse();
+        path.Reverse(); //Reverse the list to get the path from start to target
 
         return path;
     }
