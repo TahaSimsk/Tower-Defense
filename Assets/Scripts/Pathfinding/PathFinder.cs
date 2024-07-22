@@ -25,7 +25,6 @@ public class PathFinder : MonoBehaviour
 
     private void Awake()
     {
-
         gridManager = FindObjectOfType<GridManager>();
 
         if (gridManager != null)
@@ -33,30 +32,27 @@ public class PathFinder : MonoBehaviour
             grid = gridManager.Grid;
             startNode = grid[startCoordinates];
             targetNode = grid[targetCoordinates];
-
         }
-
-
     }
+
 
     void Start()
     {
-
-
         GetNewPath();
     }
+
 
     public List<Node> GetNewPath()
     {
         return GetNewPath(startCoordinates);
     }
-
     public List<Node> GetNewPath(Vector2Int coordinates)
     {
         gridManager.ResetNodes();
         BreadthFirstSearch(coordinates);
         return BuildPath();
     }
+
 
     void ExploreNeighbors()
     {
@@ -84,6 +80,7 @@ public class PathFinder : MonoBehaviour
             }
         }
     }
+
 
     void BreadthFirstSearch(Vector2Int coordinates)
     {
@@ -133,27 +130,28 @@ public class PathFinder : MonoBehaviour
         return path;
     }
 
+
     public bool WillBlockPath(Vector2Int coordinates)
     {
         if (grid.ContainsKey(coordinates))
         {
-            bool previousState = grid[coordinates].isWalkable;
-            grid[coordinates].isWalkable = false;
-            List<Node> newPath = GetNewPath();
-            grid[coordinates].isWalkable = previousState;
+            bool previousState = grid[coordinates].isWalkable; //Store the grid's walkable status
+            grid[coordinates].isWalkable = false; //Temporarily block the node
+            List<Node> newPath = GetNewPath(); //Recalculate the path when the node is unwalkable
+            grid[coordinates].isWalkable = previousState; //Restore the node's walkable state
 
-            if (newPath.Count <= 1)
+            if (newPath.Count <= 1) //Check if the recalculated path is invalid (indicating a block).
             {
-                GetNewPath();
+                GetNewPath(); //Restore the original path
                 return true;
             }
         }
         return false;
     }
 
+
     public void NotifyReceivers()
     {
         BroadcastMessage("RecalculatePath", false, SendMessageOptions.DontRequireReceiver);
     }
-
 }
